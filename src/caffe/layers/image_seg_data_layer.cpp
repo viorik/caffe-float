@@ -83,8 +83,8 @@ void ImageSegDataLayer<Dtype>::DataLayerSetUp(const vector<Blob<Dtype>*>& bottom
   }
 
   // Read an image, and use it to initialize the top blob.
-  cv::Mat cv_img = ReadImageToCVMat(root_folder + lines_[lines_id_].first,
-                                    new_height, new_width, is_color);
+  cv::Mat cv_img = ReadFloatImageToCVMat(root_folder + lines_[lines_id_].first,
+                                    new_height, new_width);
   const int channels = cv_img.channels();
   const int height = cv_img.rows;
   const int width = cv_img.cols;
@@ -176,8 +176,8 @@ void ImageSegDataLayer<Dtype>::InternalThreadEntry() {
     CHECK_GT(lines_size, lines_id_);
 
     int img_row, img_col;
-    cv_img_seg.push_back(ReadImageToCVMat(root_folder + lines_[lines_id_].first,
-	  new_height, new_width, is_color, &img_row, &img_col));
+    cv_img_seg.push_back(ReadFloatImageToCVMat(root_folder + lines_[lines_id_].first,
+      new_height, new_width, &img_row, &img_col));
 
     top_data_dim[top_data_dim_offset]     = static_cast<Dtype>(std::min(max_height, img_row));
     top_data_dim[top_data_dim_offset + 1] = static_cast<Dtype>(std::min(max_width, img_col));

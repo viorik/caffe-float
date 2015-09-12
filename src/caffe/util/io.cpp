@@ -94,6 +94,80 @@ cv::Mat ReadImageToCVMat(const string& filename,
   return cv_img;
 }
 
+cv::Mat ReadBinaryFile(const std::string &filename, const int height, const int width)
+{
+  std::ifstream ifb;
+  cv::Mat imdata(width,height,CV_32FC3);
+
+  ifb.open(filename.c_str(),std::ios::in | std::ios::binary);
+  if (!ifb)
+  {
+      std::cout<<"error reading binary file "<<filename<<std::endl;
+      exit (EXIT_FAILURE);
+  }
+
+  //std::cout<<"Start reading "<<filename<<" "<<width<<" "<<height<<std::endl;
+  float value;
+  int i=0, j=0;
+  cv::Point3f pt;
+  while (i<height && !ifb.eof())
+  {
+      j=0;
+      while (j<width && !ifb.eof())
+      {
+          ifb.read(reinterpret_cast<char*> (&value), sizeof (value));
+          pt.x = value;
+          ifb.read(reinterpret_cast<char*> (&value), sizeof (value));
+          pt.y = value;
+          ifb.read(reinterpret_cast<char*> (&value), sizeof (value));
+          pt.z = value;
+          imdata.at<cv::Point3f>(i,j) = pt;
+          ++j;
+      }
+      ++i;
+  }
+  //std::cout<<"Done reading "<<i<<" "<<j<<" "<<height<<" "<<width<<std::endl;
+  if (i<height || j<width)
+  {
+      std::cout<<"unexpected end of binary file "<<height<<" "<<width<<" "<<i<<" "<<j<<std::endl;
+      exit (EXIT_FAILURE);
+  }
+  imdata.rows = height;
+  imdata.cols = width;
+
+  ifb.close();
+
+  return imdata;
+}
+
+
+cv::Mat ReadFloatImageToCVMat(const std::string& filename,
+                              const int height, const int width,
+                              int* img_height, int* img_width) {
+  cv::Mat cv_img;
+  cv::Mat cv_img_origin = ReadBinaryFile(filename, height, width);
+  if (!cv_img_origin.data) {
+    std::cout << "Could not open or find file " << filename;
+    return cv_img_origin;
+  }
+
+  if (height > 0 && width > 0) {
+    cv::resize(cv_img_origin, cv_img, cv::Size(width, height));
+  } else {
+    cv_img = cv_img_origin;
+  }
+
+  if (img_height != NULL) {
+    *img_height = cv_img.rows;
+  }
+  if (img_width != NULL) {
+    *img_width = cv_img.cols;
+  }
+
+  return cv_img;
+}
+
+
 cv::Mat ReadImageToCVMatNearest(const string& filename,
                          const int height, const int width, const bool is_color,
                          int* img_height, int* img_width) {

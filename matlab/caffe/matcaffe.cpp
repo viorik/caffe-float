@@ -54,7 +54,10 @@ static int init_key = -2;
 static mxArray* do_forward(const mxArray* const bottom) {
   vector<Blob<float>*>& input_blobs = net_->input_blobs();
   if (static_cast<unsigned int>(mxGetDimensions(bottom)[0]) !=
-      input_blobs.size()) {
+      input_blobs.size()) 
+   {
+    std::cout<<"given input size = " << static_cast<unsigned int>(mxGetDimensions(bottom)[0]) << std::endl;
+    std::cout<<"expected input_blob_size= " << input_blobs.size() << std::endl;
     mex_error("Invalid input size");
   }
   for (unsigned int i = 0; i < input_blobs.size(); ++i) {
@@ -116,6 +119,8 @@ static mxArray* do_backward(const mxArray* const top_diff) {
   vector<Blob<float>*>& input_blobs = net_->input_blobs();
   if (static_cast<unsigned int>(mxGetDimensions(top_diff)[0]) !=
       output_blobs.size()) {
+    std::cout<<"given input size = " << static_cast<unsigned int>(mxGetDimensions(top_diff)[0]) << std::endl;
+    std::cout<<"expected output_blob_size= " << output_blobs.size() << std::endl;
     mex_error("Invalid input size");
   }
   // First, copy the output diff
